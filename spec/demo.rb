@@ -5,7 +5,7 @@ options = {
   "original" => 'test_images/test.jpg',
   "type" => "Test",
   "rotate" => 90,
-  "crop" => {:left => 100, :right => 20, :top => 20, :bottom => 20},
+  "crop" => {:width => 300, :height => 300, :top => 40, :left => 40},
   "sizes" => [
     {:width => 400, :height => 400},
     {:width => 300, :height => 300},
@@ -13,8 +13,24 @@ options = {
   ]
 }
 
-file = File.open(options.delete('original'))
+File.open('test_images/tmp.jpg','w') do |f|
+  f.write File.read(options.delete('original'))
+end
+
+file = File.open('test_images/tmp.jpg')
 
 strategy = ProtoProcessor::Strategies.create(options.delete('type'), file, options)
 
 puts strategy.run.inspect
+
+# {
+#   :CropTask=>[
+#     {:path=>"./test_images/cropped.jpg", :status=>"SUCCESS"}
+#   ], 
+#   :FailedTask=>[
+#     {:status=>"FAILURE", :error=>{:name=>"RuntimeError", :message=>"Oh no something went wrong!"}}
+#   ], 
+#   :ResizeTask=>[
+#     {:path=>"./test_images/test_400x400.jpg", :status=>"SUCCESS"}, {:path=>"./test_images/test_300x300.jpg", :status=>"SUCCESS"}, {:path=>"./test_images/test_200x200.jpg", :status=>"SUCCESS"}
+#   ]
+# }

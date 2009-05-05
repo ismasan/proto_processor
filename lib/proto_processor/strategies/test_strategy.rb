@@ -7,8 +7,11 @@ class ProtoProcessor::Strategies::TestStrategy < ProtoProcessor::Strategies::Bas
   def process
     run_task CropTask, options['crop']
     
-    run_task ResizeTask, options['sizes']
-
+    run_task ResizeTask, options['sizes'] # will iterate sizes
+    
+    run_task ResizeTask, options['bogus'] # will not run
+    
+    run_task FailedTask, options # FAILED status
   end
   
 end

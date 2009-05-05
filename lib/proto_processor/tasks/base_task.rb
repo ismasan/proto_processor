@@ -18,8 +18,7 @@ module ProtoProcessor
           process
         rescue StandardError => e
           report!(:status, 'FAILURE')
-          report!(:error, e.message)
-          puts e.backtrace.each{|i| puts i}
+          report!(:error, {:name => e.class.name, :message => e.message})
         end
         [@input, @options, @report]
       end

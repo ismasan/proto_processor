@@ -13,6 +13,7 @@ module ProtoProcessor
   module Tasks
     autoload :BaseTask, 'tasks/base_task'
     autoload :CropTask, 'tasks/crop_task'
+    autoload :FailedTask, 'tasks/failed_task'
     autoload :ResizeTask, 'tasks/resize_task'
   end
 end
