@@ -12,6 +12,7 @@ class ProtoProcessor::Strategies::TestStrategy < ProtoProcessor::Strategies::Bas
     run_task ResizeTask, options['bogus'] # will not run
     
     run_task FailedTask, options # FAILED status
+    
   end
   
 end
