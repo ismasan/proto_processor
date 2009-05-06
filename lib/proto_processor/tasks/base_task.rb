@@ -4,6 +4,7 @@ module ProtoProcessor
       
       attr_reader :input, :options, :report
       
+      # new([input, options, report])
       def initialize(args)
         raise ArgumentError, "You must provide an Enumerable object as argument" unless args.respond_to?(:each)
         raise ArgumentError, "You must provide an array with input, options and report" if args.size < 3

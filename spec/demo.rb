@@ -21,7 +21,12 @@ file = File.open('test_images/tmp.jpg')
 
 strategy = ProtoProcessor::Strategies.create(options.delete('type'), file, options)
 
-puts strategy.run.inspect
+reports = strategy.run
+
+puts reports.inspect
+# callback_to_merb reports
+
+# update_files_to_castor reports
 
 # {
 #   :CropTask=>[

@@ -23,11 +23,10 @@ class ProtoProcessor::Strategies::BaseStrategy
   #
   def run_task(task_class, options = nil)
     return false if options.nil?
-    opts = options || @options
-    if opts.kind_of?(Array)
-      opts.each {|o| run_single_task(task_class, o)}
+    if options.kind_of?(Array)
+      options.each {|o| run_single_task(task_class, o)}
     else
-      run_single_task(task_class, opts)
+      run_single_task(task_class, options)
     end
   end
   
