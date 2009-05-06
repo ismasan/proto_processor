@@ -11,8 +11,8 @@ describe "BaseTask" do
   before do
     @input = ''
     @options = {}
-    @report = {}
-    @task = FooTask.new([@input, @options, @report])
+    @global_report = {}
+    @task = FooTask.new([@input, @options, @global_report])
   end
   
   it "should raise if less than 3 arguments" do
@@ -27,10 +27,14 @@ describe "BaseTask" do
     }.should raise_error(ArgumentError)
   end
   
-  it "should have input, options and report" do
+  it "should have input, options and global_report" do
     @task.input.should == @input
     @task.options.should == @options
-    @task.report.should == @report
+    @task.global_report.should == @global_report
+  end
+  
+  it "should not be successful before running" do
+    @task.successful?.should_not be_true
   end
   
   describe "running" do
@@ -50,9 +54,19 @@ describe "BaseTask" do
       output[1].should == @options
     end
     
-    it "should return report with task name entry" do
+    it "should return global report with task name entry" do
       output = @task.run
       output[2].has_key?(:FooTask).should be_true
+    end
+    
+    it "should have task-local report for easy access" do
+      input, options, global_report = @task.run
+      @task.report.should == global_report[:FooTask].last
+    end
+    
+    it "should be successful after running (successfully)" do
+      @task.run
+      @task.successful?.should be_true
     end
     
   end
