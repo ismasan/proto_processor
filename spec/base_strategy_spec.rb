@@ -92,6 +92,20 @@ describe "BaseStrategy" do
       @strategy.report.has_key?(:FooTask).should be_true
     end
     
+    describe "with an optional block" do
+      before do
+        BAS::FooTask.stub!(:new).and_return @mock_task
+        @some_collaborator = mock('Collaborator')
+      end
+      
+      it "should pass task to block if block given" do
+        @some_collaborator.should_receive(:do_something).with(@mock_task)
+        @strategy.run_task BAS::FooTask, {} do |task|
+          @some_collaborator.do_something(task)
+        end
+      end
+    end
+    
   end
   
   describe 'running main process' do
