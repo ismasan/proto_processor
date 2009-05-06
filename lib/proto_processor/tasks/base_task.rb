@@ -1,5 +1,12 @@
 module ProtoProcessor
   module Tasks
+    
+    class InvalidTaskError < StandardError
+      def message
+        "Invalid task"
+      end
+    end
+    
     class BaseTask
       
       attr_reader :input, :options, :global_report, :report
@@ -15,6 +22,7 @@ module ProtoProcessor
       
       def run
         begin
+          validate!
           process
           report!(:status, 'SUCCESS')
           @success = true
@@ -29,6 +37,16 @@ module ProtoProcessor
         @success
       end
       
+      # === Validate in subclasses
+      # Example:
+      # def valid?
+      #   options[:some].nil?
+      # end
+      #
+      def valid?
+        true
+      end
+      
       # Abstract
       #
       def process
@@ -36,6 +54,10 @@ module ProtoProcessor
       end
       
       protected
+      
+      def validate!
+        raise InvalidTaskError unless valid?
+      end
       
       def initialize_run_report
         @report = {}

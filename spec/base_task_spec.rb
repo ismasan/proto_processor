@@ -7,6 +7,17 @@ class FooTask < ProtoProcessor::Tasks::BaseTask
   end
 end
 
+class InvalidTask < ProtoProcessor::Tasks::BaseTask
+  
+  def process
+    @input = "I got here"
+  end
+  
+  def valid?
+    false
+  end
+end
+
 describe "BaseTask" do
   before do
     @input = ''
@@ -27,6 +38,10 @@ describe "BaseTask" do
     }.should raise_error(ArgumentError)
   end
   
+  it "should be valid by default" do
+    @task.valid?.should be_true
+  end
+  
   it "should have input, options and global_report" do
     @task.input.should == @input
     @task.options.should == @options
@@ -35,6 +50,24 @@ describe "BaseTask" do
   
   it "should not be successful before running" do
     @task.successful?.should_not be_true
+  end
+  
+  describe "invalid tasks" do
+    before do
+      @invalid_task = InvalidTask.new(['', {}, @global_report])
+    end
+    
+    it "should be invalid (duh!)" do
+      @invalid_task.valid?.should be_false
+    end
+    
+    it "should not process if not valid" do
+      # if the input is modified, it means that it did run #process
+      # we can't use expectations because I'm rescueing exceptions, including RSpec ones!
+      output = @invalid_task.run
+      output.first.should be_empty
+      
+    end
   end
   
   describe "running" do

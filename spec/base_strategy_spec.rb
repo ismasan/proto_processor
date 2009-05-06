@@ -53,7 +53,7 @@ describe "BaseStrategy" do
   describe 'running tasks with #run_task' do
     before do
       @strategy = FooBarStrategy.new(@input, @options)
-      @mock_task = mock('task', :run => true)
+      @mock_task = mock('task', :run => true, :valid? => true)
     end
     
     it "should have an initial report" do
@@ -111,7 +111,7 @@ describe "BaseStrategy" do
   describe 'running main process' do
     before do
       @strategy = FooBarStrategy.new(@input, @options)
-      @mock_task = mock('task', :run => [@input, @options, @strategy.report])
+      @mock_task = mock('task', :run => [@input, @options, @strategy.report], :valid? => true)
     end
     
     it "should accumulate result of tasks" do
