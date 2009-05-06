@@ -21,7 +21,10 @@ class FooBarStrategy < ProtoProcessor::Strategies::BaseStrategy
   def process
     run_task BAS::FooTask, options
     run_task BAS::BarTask, options
-    run_task BAS::FooTask, options['sizes'] # iterate sizes
+    options['sizes'].each do |size_params|
+      run_task BAS::FooTask, size_params
+    end
+    
   end
   
 end
@@ -60,6 +63,11 @@ describe "BaseStrategy" do
       @strategy.report.should == {}
     end
     
+    it "should delegate to Task Runner with array of one task, input, options and report" do
+      ProtoProcessor::Tasks::Runner.should_receive(:run_chain).with([BAS::FooTask], @input, @options, @strategy.report)
+      @strategy.run_task BAS::FooTask, @options
+    end
+    
     it "should run a task with default input, options and report" do
       BAS::FooTask.should_receive(:new).with([@input,@options,@strategy.report]).and_return @mock_task
       @strategy.run_task BAS::FooTask, @options
@@ -76,36 +84,6 @@ describe "BaseStrategy" do
       @strategy.run_task BAS::FooTask, opts
     end
     
-    it "should iterate options with task if passed an array of options" do
-      BAS::FooTask.should_receive(:new).exactly(3).and_return @mock_task
-      @strategy.run_task BAS::FooTask, @options['sizes']
-    end
-    
-    it "should intantiate and run the task" do
-      BAS::FooTask.stub!(:new).and_return @mock_task
-      @mock_task.should_receive(:run)
-      @strategy.run_task BAS::FooTask, {}
-    end
-    
-    it "should run a task with input and report" do
-      @strategy.run_task BAS::FooTask, {}
-      @strategy.report.has_key?(:FooTask).should be_true
-    end
-    
-    describe "with an optional block" do
-      before do
-        BAS::FooTask.stub!(:new).and_return @mock_task
-        @some_collaborator = mock('Collaborator')
-      end
-      
-      it "should pass task to block if block given" do
-        @some_collaborator.should_receive(:do_something).with(@mock_task)
-        @strategy.run_task BAS::FooTask, {} do |task|
-          @some_collaborator.do_something(task)
-        end
-      end
-    end
-    
   end
   
   describe 'running main process' do
@@ -115,6 +93,7 @@ describe "BaseStrategy" do
     end
     
     it "should accumulate result of tasks" do
+      pending 'this belongs in the task runner'
       BAS::FooTask.should_receive(:new).exactly(4).and_return @mock_task
       BAS::BarTask.should_receive(:new).exactly(1).and_return @mock_task
       @strategy.run

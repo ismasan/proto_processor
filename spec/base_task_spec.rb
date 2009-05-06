@@ -4,6 +4,7 @@ class FooTask < ProtoProcessor::Tasks::BaseTask
   
   def process
     @input << 'a'
+    report! :foo, 'foo'
   end
 end
 
@@ -22,8 +23,8 @@ describe "BaseTask" do
   before do
     @input = ''
     @options = {}
-    @global_report = {}
-    @task = FooTask.new([@input, @options, @global_report])
+    @report = {}
+    @task = FooTask.new([@input, @options, @report])
   end
   
   it "should raise if less than 3 arguments" do
@@ -38,14 +39,20 @@ describe "BaseTask" do
     }.should raise_error(ArgumentError)
   end
   
+  it "should raise if report does not cuack like a Hash" do
+    lambda {
+      FooTask.new(['',{},10])
+    }.should raise_error(ArgumentError)
+  end
+  
   it "should be valid by default" do
     @task.valid?.should be_true
   end
   
-  it "should have input, options and global_report" do
+  it "should have input, options and report" do
     @task.input.should == @input
     @task.options.should == @options
-    @task.global_report.should == @global_report
+    @task.report.should == @report
   end
   
   it "should not be successful before running" do
@@ -54,7 +61,7 @@ describe "BaseTask" do
   
   describe "invalid tasks" do
     before do
-      @invalid_task = InvalidTask.new(['', {}, @global_report])
+      @invalid_task = InvalidTask.new(['', {}, @report])
     end
     
     it "should be invalid (duh!)" do
@@ -87,14 +94,9 @@ describe "BaseTask" do
       output[1].should == @options
     end
     
-    it "should return global report with task name entry" do
+    it "should add stuff to report" do
       output = @task.run
-      output[2].has_key?(:FooTask).should be_true
-    end
-    
-    it "should have task-local report for easy access" do
-      input, options, global_report = @task.run
-      @task.report.should == global_report[:FooTask].last
+      output[2].should == {:status => 'SUCCESS', :foo => 'foo'}
     end
     
     it "should be successful after running (successfully)" do
@@ -110,6 +112,7 @@ class BarTask < ProtoProcessor::Tasks::BaseTask
   
   def process
     @input << 'b'
+    report! :bar, 'bar'
   end
 end
 
@@ -126,7 +129,6 @@ describe "decorating the same or other tasks" do
     input, options, report = task.run
     
     input.should == 'aaaaab'
-    report[:FooTask].size.should == 5
-    report[:BarTask].size.should == 1
+    report.should == {:bar=>"bar", :status=>"SUCCESS", :foo=>"foo"}
   end
 end

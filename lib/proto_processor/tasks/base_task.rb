@@ -9,15 +9,15 @@ module ProtoProcessor
     
     class BaseTask
       
-      attr_reader :input, :options, :global_report, :report
+      attr_reader :input, :options, :report
       
       # new([input, options, report])
       def initialize(args)
         raise ArgumentError, "You must provide an Enumerable object as argument" unless args.respond_to?(:each)
         raise ArgumentError, "You must provide an array with input, options and report" if args.size < 3
-        @input, @options, @global_report = args[0].dup, args[1].dup, args[2]
+        raise ArgumentError, "A task report must be or behave like a Hash" unless args.last.respond_to?(:[]=)
+        @input, @options, @report = args[0].dup, args[1].dup, args[2].dup
         @success = false
-        initialize_run_report
       end
       
       def run
@@ -30,7 +30,7 @@ module ProtoProcessor
           report!(:status, 'FAILURE')
           report!(:error, {:name => e.class.name, :message => e.message})
         end
-        [@input, @options, @global_report]
+        [@input, @options, @report]
       end
       
       def successful?
@@ -57,13 +57,6 @@ module ProtoProcessor
       
       def validate!
         raise InvalidTaskError unless valid?
-      end
-      
-      def initialize_run_report
-        @report = {}
-        report_key = self.class.name.split('::').last.to_sym
-        @global_report[report_key] = [] unless @global_report.has_key?(report_key)
-        @global_report[report_key] << @report # report for this run, so we can run the same task several times
       end
       
       def report!(key, value)

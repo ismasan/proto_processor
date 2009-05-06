@@ -23,19 +23,13 @@ class ProtoProcessor::Strategies::BaseStrategy
   #
   def run_task(task_class, options = nil, &block)
     return false if options.nil?
-    if options.kind_of?(Array)
-      options.each {|o| run_single_task(task_class, o, &block)}
-    else
-      run_single_task(task_class, options, &block)
-    end
+    run_single_task_or_chain(task_class, options, &block)
   end
   
   protected
   
-  def run_single_task(task_class, options, &block)
-    task = task_class.new([@input, options, @report])
-    @input, temp_options, @report = task.run
-    yield task if block_given?
+  def run_single_task_or_chain(task_class, options, &block)
+    @input, temp_options, @report = Runner.run_chain([*task_class],@input, options, @report, &block)
   end
   
 end
