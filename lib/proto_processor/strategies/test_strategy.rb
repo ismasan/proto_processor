@@ -10,7 +10,7 @@ class ProtoProcessor::Strategies::TestStrategy < ProtoProcessor::Strategies::Bas
     run_task ResizeTask, options['sizes'] # will iterate sizes
     
     options['sizes'].each do |size_params|
-      run_task [ResizeTask, CastorTask, CallbackTask], size_params
+      run_task [ResizeTask, SomeOtherTask, CallbackTask], size_params
     end
     
     run_task ResizeTask, options['bogus'] # will not run
