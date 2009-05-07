@@ -1,9 +1,56 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'proto_processor'
 
+class CropTask
+  include ProtoProcessor::Task
+  def process
+    new_name = input.path#'./test_images/cropped.jpg'
+    `convert -crop #{options[:width]}x#{options[:height]}+#{options[:top]}+#{options[:left]} #{input.path} #{new_name}`
+    report! :path, new_name
+  end
+end
+
+class FailedTask
+  include ProtoProcessor::Task
+  def process
+    raise 'Oh no something went wrong!'
+  end
+end
+
+class ResizeTask
+  include ProtoProcessor::Task
+  def process
+    new_name = "./test_images/test_#{options[:width]}x#{options[:height]}.jpg"
+    `convert -resize #{options[:width]}x#{options[:height]} #{input.path} #{new_name}`
+    report! :path, new_name
+  end
+  
+end
+
+class TestStrategy
+  include ProtoProcessor::Strategy
+  
+  # file = File.open('test.jpg')
+  # s = TestStrategy.new(file, {})
+  # s.run
+  
+  def process
+    run_task CropTask, options['crop']
+    
+    options['sizes'].each do |size_params|
+      run_task ResizeTask, size_params
+    end
+    
+    run_task ResizeTask, options['bogus'] # will not run
+    
+    run_task FailedTask, options # FAILED status
+    
+  end
+  
+end
+
 options = {
   "original" => 'test_images/test.jpg',
-  "type" => "Test",
   "rotate" => 90,
   "crop" => {:width => 300, :height => 300, :top => 40, :left => 40},
   "sizes" => [
@@ -19,7 +66,7 @@ end
 
 file = File.open('test_images/tmp.jpg')
 
-strategy = ProtoProcessor::Strategies.create(options.delete('type'), file, options)
+strategy = TestStrategy.new(file, options)
 
 reports = strategy.run
 
