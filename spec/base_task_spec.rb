@@ -1,15 +1,15 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-class FooTask < ProtoProcessor::Tasks::BaseTask
-  
+class FooTask
+  include ProtoProcessor::Task
   def process
     @input << 'a'
     report! :foo, 'foo'
   end
 end
 
-class InvalidTask < ProtoProcessor::Tasks::BaseTask
-  
+class InvalidTask
+  include ProtoProcessor::Task
   def process
     @input = "I got here"
   end
@@ -19,7 +19,7 @@ class InvalidTask < ProtoProcessor::Tasks::BaseTask
   end
 end
 
-describe "BaseTask" do
+describe "Task" do
   before do
     @input = ''
     @options = {}
@@ -108,8 +108,8 @@ describe "BaseTask" do
   
 end
 
-class BarTask < ProtoProcessor::Tasks::BaseTask
-  
+class BarTask
+  include ProtoProcessor::Task
   def process
     @input << 'b'
     report! :bar, 'bar'

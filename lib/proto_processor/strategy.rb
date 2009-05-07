@@ -1,7 +1,10 @@
-class ProtoProcessor::Strategies::BaseStrategy
-  include ProtoProcessor::Tasks
+module ProtoProcessor::Strategy
   
-  attr_reader :report, :input, :options
+  def self.included(base)
+    base.class_eval do
+      attr_reader :report, :input, :options
+    end
+  end
   
   def initialize(input, options = {})
     @input, @options = input, options
@@ -29,7 +32,7 @@ class ProtoProcessor::Strategies::BaseStrategy
   protected
   
   def run_single_task_or_chain(task_class, options, &block)
-    @input, temp_options, @report = Runner.run_chain([*task_class],@input, options, @report, &block)
+    @input, temp_options, @report = ProtoProcessor::TaskRunner.run_chain([*task_class],@input, options, @report, &block)
   end
   
 end

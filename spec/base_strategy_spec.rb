@@ -1,14 +1,16 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 module BAS
-  class BAS::FooTask < ProtoProcessor::Tasks::BaseTask
+  class BAS::FooTask
+    include ProtoProcessor::Task
     def process
       @input << 'FOO'
       report!(:hello, @input)
     end
   end
 
-  class BAS::BarTask < ProtoProcessor::Tasks::BaseTask
+  class BAS::BarTask
+    include ProtoProcessor::Task
     def process
       @input << 'BAR'
       report!(:hello, @input)
@@ -16,8 +18,8 @@ module BAS
   end
 end
 
-class FooBarStrategy < ProtoProcessor::Strategies::BaseStrategy
-  
+class FooBarStrategy
+  include ProtoProcessor::Strategy
   def process
     run_task BAS::FooTask, options
     run_task BAS::BarTask, options
@@ -42,17 +44,6 @@ describe "BaseStrategy" do
     }
   end
   
-  describe 'factory' do
-    it "should resolve strategy class according to 'type' option" do
-      ProtoProcessor::Strategies.create(@options.delete('type'), @input).should be_kind_of(FooBarStrategy)
-    end
-
-    it "should instantiate concrete strategy with options" do
-      FooBarStrategy.should_receive(:new).with(@input, @options)
-      ProtoProcessor::Strategies.create(@options.delete('type'), @input, @options)
-    end
-  end
-  
   describe 'running tasks with #run_task' do
     before do
       @strategy = FooBarStrategy.new(@input, @options)
@@ -64,7 +55,7 @@ describe "BaseStrategy" do
     end
     
     it "should delegate to Task Runner with array of one task, input, options and report" do
-      ProtoProcessor::Tasks::Runner.should_receive(:run_chain).with([BAS::FooTask], @input, @options, @strategy.report)
+      ProtoProcessor::TaskRunner.should_receive(:run_chain).with([BAS::FooTask], @input, @options, @strategy.report)
       @strategy.run_task BAS::FooTask, @options
     end
     
