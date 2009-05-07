@@ -18,6 +18,10 @@ module ProtoProcessor::Strategy
     raise NotImplementedError, "You must implement #process in your strategies"
   end
   
+  def with_input(input)
+    @current_input = input.dup # dup so we don't overwrite passed input later on
+  end
+  
   def current_input
     @current_input ||= ''
   end

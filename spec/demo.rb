@@ -17,9 +17,17 @@ class FailedTask
   end
 end
 
+class LogTask
+  include ProtoProcessor::Task
+  def process
+    puts "--- Resized to #{report[:path]} with size #{options[:width]}x#{options[:height]}"
+  end
+end
+
 class ResizeTask
   include ProtoProcessor::Task
   def process
+    puts "Resizing #{input}"
     new_name = "./test_images/test_#{options[:width]}x#{options[:height]}.jpg"
     `convert -resize #{options[:width]}x#{options[:height]} #{input.path} #{new_name}`
     report! :path, new_name
@@ -35,19 +43,22 @@ class TestStrategy
   # s.run
   
   def initialize(input, options)
-    @input, @options
+    @input, @options = input, options
   end
   
   def process
-    run_task CropTask, options['crop']
     
-    options['sizes'].each do |size_params|
-      run_task ResizeTask, size_params
+    with_input @input
+    
+    run_task CropTask, @options['crop']
+    
+    @options['sizes'].each do |size_params|
+      run_task [ResizeTask, LogTask], size_params
     end
     
-    run_task ResizeTask, options['bogus'] # will not run
+    run_task ResizeTask, @options['bogus'] # will not run
     
-    run_task FailedTask, options # FAILED status
+    run_task FailedTask, @options # FAILED status
     
   end
   
@@ -74,7 +85,7 @@ strategy = TestStrategy.new(file, options)
 
 reports = strategy.run
 
-puts reports.inspect
+puts reports.chain_outputs.inspect
 # callback_to_merb reports
 
 # update_files_to_castor reports

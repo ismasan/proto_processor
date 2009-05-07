@@ -65,6 +65,13 @@ describe "Strategy" do
       @strategy.run_task BAS::FooTask, @options
     end
     
+    it "should be able to change the input for upcoming tasks" do
+      new_input = 'a different input'
+      @strategy.runner.should_receive(:run_chain).with(:FooTask, [BAS::FooTask], new_input, @options, {})
+      @strategy.with_input new_input
+      @strategy.run_task BAS::FooTask, @options
+    end
+    
     it "should run a task with default input, options and report" do
       BAS::FooTask.should_receive(:new).with([@strategy.current_input,@options,{}]).and_return @mock_task
       @strategy.run_task BAS::FooTask, @options

@@ -2,6 +2,8 @@ module ProtoProcessor
   class Report
     include Enumerable
     
+    attr_reader :chain_outputs, :chain_tasks
+    
     def initialize
       @chain_outputs = {}
       @chain_tasks = {}
