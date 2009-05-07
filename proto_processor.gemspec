@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{proto_processor}
-  s.version = "0.0.2"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ismael Celis"]
@@ -18,17 +18,15 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION.yml",
     "lib/proto_processor.rb",
-    "lib/proto_processor/strategies/base_strategy.rb",
-    "lib/proto_processor/strategies/test_strategy.rb",
-    "lib/proto_processor/tasks/base_task.rb",
-    "lib/proto_processor/tasks/crop_task.rb",
-    "lib/proto_processor/tasks/failed_task.rb",
-    "lib/proto_processor/tasks/resize_task.rb",
-    "lib/proto_processor/tasks/runner.rb",
+    "lib/proto_processor/report.rb",
+    "lib/proto_processor/strategy.rb",
+    "lib/proto_processor/task.rb",
+    "lib/proto_processor/task_runner.rb",
     "spec/base_strategy_spec.rb",
     "spec/base_task_spec.rb",
     "spec/demo.rb",
     "spec/proto_processor_spec.rb",
+    "spec/report_spec.rb",
     "spec/spec_helper.rb",
     "spec/tasks_runner_spec.rb",
     "spec/test_images/test.jpg",
@@ -48,6 +46,7 @@ Gem::Specification.new do |s|
     "spec/base_task_spec.rb",
     "spec/demo.rb",
     "spec/proto_processor_spec.rb",
+    "spec/report_spec.rb",
     "spec/spec_helper.rb",
     "spec/tasks_runner_spec.rb"
   ]
