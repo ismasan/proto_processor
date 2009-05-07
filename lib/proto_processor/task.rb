@@ -29,6 +29,9 @@ module ProtoProcessor
         process
         report!(:status, 'SUCCESS')
         @success = true
+      rescue Spec::Mocks::MockExpectationError => e
+        # this is a hack to avoid breaking RSpec, which relies on exceptions for expectations
+        raise
       rescue StandardError => e
         report!(:status, 'FAILURE')
         report!(:error, {:name => e.class.name, :message => e.message})
