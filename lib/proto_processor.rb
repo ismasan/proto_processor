@@ -5,5 +5,5 @@ module ProtoProcessor
   autoload :Task, 'task'
   autoload :Strategy, 'strategy'
   autoload :TaskRunner, 'task_runner'
-
+  autoload :Report, 'report'
 end

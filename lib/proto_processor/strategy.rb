@@ -1,24 +1,25 @@
 module ProtoProcessor::Strategy
   
-  def self.included(base)
-    base.class_eval do
-      attr_reader :report, :input, :options
-    end
+  def report
+    @report ||= ProtoProcessor::Report.new
   end
   
-  def initialize(input, options = {})
-    @input, @options = input, options
-    @report = {}
+  def runner
+    @task_runner ||= ProtoProcessor::TaskRunner.new(report)
   end
   
   def run
     process
-    yield @report if block_given?
-    @report
+    yield report if block_given?
+    report
   end
   
   def process
     raise NotImplementedError, "You must implement #process in your strategies"
+  end
+  
+  def current_input
+    @current_input ||= ''
   end
   
   # === Run a task and update input and report (but don't update options)
@@ -26,13 +27,14 @@ module ProtoProcessor::Strategy
   #
   def run_task(task_class, options = nil, &block)
     return false if options.nil?
-    run_single_task_or_chain(task_class, options, &block)
+    run_task_chain([*task_class], options, &block)
   end
   
   protected
   
-  def run_single_task_or_chain(task_class, options, &block)
-    @input, temp_options, @report = ProtoProcessor::TaskRunner.run_chain([*task_class],@input, options, @report, &block)
+  def run_task_chain(task_classes, options, &block)
+    chain_key = task_classes.first.name.split('::').last.to_sym
+    @current_input, temp_options, task_report = runner.run_chain(chain_key, task_classes,current_input, options, {}, &block)
   end
   
 end

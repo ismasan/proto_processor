@@ -20,6 +20,17 @@ end
 
 class FooBarStrategy
   include ProtoProcessor::Strategy
+  
+  def options
+    options = {
+      "original" => 'sample_image.jpg',
+      "type" => "FooBar",
+      "rotate" => 90,
+      "crop" => 'crop_options',
+      "sizes" => [{'width' => 100}, {'width' => 200}, {'width' => 300}]
+    }
+  end
+  
   def process
     run_task BAS::FooTask, options
     run_task BAS::BarTask, options
@@ -31,36 +42,31 @@ class FooBarStrategy
   
 end
 
-describe "BaseStrategy" do
-  
-  before do 
-    @input = ''
-    @options = {
-      "original" => 'sample_image.jpg',
-      "type" => "FooBar",
-      "rotate" => 90,
-      "crop" => 'crop_options',
-      "sizes" => [{'width' => 100}, {'width' => 200}, {'width' => 300}]
-    }
+describe "Strategy" do
+  before do
+    @strategy = FooBarStrategy.new
+    @options = @strategy.options
   end
-  
   describe 'running tasks with #run_task' do
     before do
-      @strategy = FooBarStrategy.new(@input, @options)
       @mock_task = mock('task', :run => true, :valid? => true)
     end
     
-    it "should have an initial report" do
-      @strategy.report.should == {}
+    it "should have a task runner" do
+      @strategy.runner.should be_kind_of(ProtoProcessor::TaskRunner)
     end
     
-    it "should delegate to Task Runner with array of one task, input, options and report" do
-      ProtoProcessor::TaskRunner.should_receive(:run_chain).with([BAS::FooTask], @input, @options, @strategy.report)
+    it "should have an initial report" do
+      @strategy.report.should be_kind_of(ProtoProcessor::Report)
+    end
+    
+    it "should delegate to Task Runner with run key, array of one task, input, options and report" do
+      @strategy.runner.should_receive(:run_chain).with(:FooTask, [BAS::FooTask], @strategy.current_input, @options, {})
       @strategy.run_task BAS::FooTask, @options
     end
     
     it "should run a task with default input, options and report" do
-      BAS::FooTask.should_receive(:new).with([@input,@options,@strategy.report]).and_return @mock_task
+      BAS::FooTask.should_receive(:new).with([@strategy.current_input,@options,{}]).and_return @mock_task
       @strategy.run_task BAS::FooTask, @options
     end
     
@@ -71,7 +77,7 @@ describe "BaseStrategy" do
     
     it "should run a task with passed options" do
       opts = {:blah => 1}
-      BAS::FooTask.should_receive(:new).with([@input,opts,@strategy.report]).and_return @mock_task
+      BAS::FooTask.should_receive(:new).with([@strategy.current_input,opts,{}]).and_return @mock_task
       @strategy.run_task BAS::FooTask, opts
     end
     
@@ -79,8 +85,7 @@ describe "BaseStrategy" do
   
   describe 'running main process' do
     before do
-      @strategy = FooBarStrategy.new(@input, @options)
-      @mock_task = mock('task', :run => [@input, @options, @strategy.report], :valid? => true)
+      @mock_task = mock('task', :run => [@input, @options, {}], :valid? => true)
     end
     
     it "should accumulate result of tasks" do
@@ -92,7 +97,7 @@ describe "BaseStrategy" do
     
     it "should update values" do
       report = @strategy.run
-      @strategy.input.should == 'FOOBARFOOFOOFOO'
+      @strategy.current_input.should == 'FOOBARFOOFOOFOO'
     end
     
   end

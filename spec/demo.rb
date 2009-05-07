@@ -34,6 +34,10 @@ class TestStrategy
   # s = TestStrategy.new(file, {})
   # s.run
   
+  def initialize(input, options)
+    @input, @options
+  end
+  
   def process
     run_task CropTask, options['crop']
     
