@@ -4,7 +4,7 @@ require 'proto_processor'
 class CropTask
   include ProtoProcessor::Task
   def process
-    new_name = input.path#'./test_images/cropped.jpg'
+    new_name = input.path
     `convert -crop #{options[:width]}x#{options[:height]}+#{options[:top]}+#{options[:left]} #{input.path} #{new_name}`
     report! :path, new_name
   end
@@ -75,29 +75,14 @@ options = {
   ]
 }
 
-File.open('test_images/tmp.jpg','w') do |f|
+File.open('test_images/test_tmp.jpg','w') do |f|
   f.write File.read(options.delete('original'))
 end
 
-file = File.open('test_images/tmp.jpg')
+file = File.open('test_images/test_tmp.jpg')
 
 strategy = TestStrategy.new(file, options)
 
 reports = strategy.run
 
 puts reports.chain_outputs.inspect
-# callback_to_merb reports
-
-# update_files_to_castor reports
-
-# {
-#   :CropTask=>[
-#     {:path=>"./test_images/cropped.jpg", :status=>"SUCCESS"}
-#   ], 
-#   :FailedTask=>[
-#     {:status=>"FAILURE", :error=>{:name=>"RuntimeError", :message=>"Oh no something went wrong!"}}
-#   ], 
-#   :ResizeTask=>[
-#     {:path=>"./test_images/test_400x400.jpg", :status=>"SUCCESS"}, {:path=>"./test_images/test_300x300.jpg", :status=>"SUCCESS"}, {:path=>"./test_images/test_200x200.jpg", :status=>"SUCCESS"}
-#   ]
-# }

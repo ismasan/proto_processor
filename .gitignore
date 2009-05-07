@@ -3,4 +3,4 @@
 coverage
 rdoc
 pkg
-spec/test_images
+demo/test_images/test_*.jpg
