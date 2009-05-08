@@ -83,6 +83,19 @@ describe "Task" do
     
   end
   
+  describe 'task receiving failed report' do
+    before do
+      @task = FooTask.new([@input, @options, {:status => 'FAILURE'}])
+    end
+    
+    it "should halt processing" do
+      @task.should_not_receive(:process)
+      @task.run
+      @task.should_not be_successful
+      @task.report[:status].should == 'FAILURE'
+    end
+  end
+  
   describe "running" do
     
     it "should invoke :process" do

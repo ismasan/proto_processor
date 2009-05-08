@@ -24,8 +24,15 @@ module ProtoProcessor
       @error = nil
     end
     
+    class HaltedChainError < StandardError
+      def message
+        "Task not run because previous task failed"
+      end
+    end
+    
     def run
       begin
+        raise HaltedChainError if report[:status] == 'FAILURE'
         validate!
         before_process
         process
