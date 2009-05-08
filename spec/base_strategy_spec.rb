@@ -49,7 +49,7 @@ describe "Strategy" do
   end
   describe 'running tasks with #run_task' do
     before do
-      @mock_task = mock('task', :run => true, :valid? => true)
+      @mock_task = mock('task', :run => true, :valid? => true, :successful? => true)
     end
     
     it "should have a task runner" do

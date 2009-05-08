@@ -2,11 +2,13 @@ module ProtoProcessor
   class Report
     include Enumerable
     
-    attr_reader :chain_outputs, :chain_tasks, :error
+    attr_reader :chain_outputs, :chain_tasks, :error, :chain_statuses
     
     def initialize
       @chain_outputs = {}
       @chain_tasks = {}
+      
+      @chain_statuses = []
       @error = nil
     end
     
@@ -31,6 +33,22 @@ module ProtoProcessor
       @error = exception
     end
     
+    def successful?
+      @error.nil?
+    end
+    
+    def run_report
+      @run_report ||= begin
+        rep = {}
+        @chain_tasks.each do |task_name, runs|
+          runs.each_with_index do |r, i|
+            rep[:"#{task_name}_#{i}"] = r.map{|t| "#{t.class.name}: #{t.report[:status]}"}
+          end
+        end
+        rep
+      end
+    end
+    
     protected
     
     # {
@@ -46,9 +64,13 @@ module ProtoProcessor
     #   :FooTask => [[task1,task2],[task1,task2]],
     #   :BarTask => [[task1,task2],[task1,task2]]
     # }
+    
+    
     def report_tasks(chain_key, tasks)
       @chain_tasks[chain_key] ||= []
       @chain_tasks[chain_key] << [*tasks]
+      
+      @chain_statuses << tasks.map{|t|t.successful?}
     end
     
   end
