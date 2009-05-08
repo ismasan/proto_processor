@@ -59,6 +59,12 @@ describe "Task" do
     @task.successful?.should_not be_true
   end
   
+  it "should update input with #update_input!" do
+    @task.input.should == ''
+    @task.update_input!(2)
+    @task.input.should == 2
+  end
+  
   describe "invalid tasks" do
     before do
       @invalid_task = InvalidTask.new(['', {}, @report])
@@ -73,8 +79,8 @@ describe "Task" do
       # we can't use expectations because I'm rescueing exceptions, including RSpec ones!
       output = @invalid_task.run
       output.first.should be_empty
-      
     end
+    
   end
   
   describe "running" do
@@ -106,6 +112,32 @@ describe "Task" do
     
   end
   
+  describe 'process callbacks' do
+    before :all do
+      class ATask
+        include ProtoProcessor::Task
+        def before_process
+          @input.before
+        end
+        def process
+          @input.process
+        end
+        def after_process
+          @input.after
+        end
+      end
+      @input = mock('input', :before =>1, :process => 2, :after => 3)
+      
+    end
+    
+    it "should invoke after and before process callbacks" do
+      @input.should_receive(:before)
+      @input.should_receive(:process)
+      @input.should_receive(:after)
+      ATask.new([@input, {}, {}]).run
+    end
+  end
+  
 end
 
 class BarTask
@@ -122,7 +154,9 @@ describe "decorating the same or other tasks" do
     input, options, report = '', {}, {}
     1.upto(5) do |i|
       task = FooTask.new([input, options, report])
+      old_input = input
       input, options, report = task.run
+      old_input.object_id.should == input.object_id
     end
     
     task = BarTask.new([input, options, report])

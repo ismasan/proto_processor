@@ -9,7 +9,12 @@ module ProtoProcessor::Strategy
   end
   
   def run
-    process
+    begin
+      process
+    rescue StandardError => e
+      report.fail!(e)
+      ProtoProcessor.logger.debug e.message + "\n" + e.backtrace.join("\n")
+    end
     yield report if block_given?
     report
   end
@@ -19,7 +24,7 @@ module ProtoProcessor::Strategy
   end
   
   def with_input(input)
-    @current_input = input.dup # dup so we don't overwrite passed input later on
+    @current_input = input#.dup # dup so we don't overwrite passed input later on
   end
   
   def current_input

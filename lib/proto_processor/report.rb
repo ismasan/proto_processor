@@ -2,11 +2,12 @@ module ProtoProcessor
   class Report
     include Enumerable
     
-    attr_reader :chain_outputs, :chain_tasks
+    attr_reader :chain_outputs, :chain_tasks, :error
     
     def initialize
       @chain_outputs = {}
       @chain_tasks = {}
+      @error = nil
     end
     
     # == Store tasks and output after running task chain
@@ -22,6 +23,12 @@ module ProtoProcessor
     
     def [](chain_key)
       @chain_outputs[chain_key]
+    end
+    
+    # Major fail at strategy level
+    #
+    def fail!(exception)
+      @error = exception
     end
     
     protected
