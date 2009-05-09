@@ -1,8 +1,10 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 module TVS
-  class FooTask
+  class MockTask
     include ProtoProcessor::Task
+  end
+  class FooTask < MockTask
     
     expects_options_with :id, :name
     

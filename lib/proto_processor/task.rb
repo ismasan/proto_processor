@@ -26,8 +26,10 @@ module ProtoProcessor
     def self.included(base)
       base.class_eval do
         attr_reader :input, :options, :report, :error
+        puts "Including validations in #{base.name}"
+        extend Validations
       end
-      base.extend Validations
+      #base.extend Validations
     end
     
     # new([input, options, report])
