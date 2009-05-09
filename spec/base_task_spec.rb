@@ -14,7 +14,7 @@ class InvalidTask
     @input = "I got here"
   end
   
-  def valid?
+  def validate
     false
   end
 end
