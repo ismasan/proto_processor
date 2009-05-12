@@ -75,9 +75,9 @@ If parameters declared in this way are not present in the options, a ProtoProces
 
 You can also raise manually in the process method.
 
-   def process
-    raise ArgumentError, ":width option must be > 0" if options[:width] < 1
-   end
+    def process
+      raise ArgumentError, ":width option must be > 0" if options[:width] < 1
+    end
 
 Tasks also have *before_process* and *after_process* callbacks that will run if defined. You can guess what they do :)
 
@@ -133,8 +133,8 @@ If :some_key doesn't exist in the passed report, the task will not process and h
 
 Default to STDOUT. Just add your own logger and logger level.
 
-ProtoProcessor.logger = Logger.new('my_processor.log')
-ProtoProcessor.logger.level = Logger::ERROR
+    ProtoProcessor.logger = Logger.new('my_processor.log')
+    ProtoProcessor.logger.level = Logger::ERROR
 
 
 ## Copyright
