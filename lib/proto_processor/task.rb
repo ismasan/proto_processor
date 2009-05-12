@@ -26,7 +26,6 @@ module ProtoProcessor
     def self.included(base)
       base.class_eval do
         attr_reader :input, :options, :report, :error
-        puts "Including validations in #{base.name}"
         extend Validations
       end
       #base.extend Validations
@@ -64,8 +63,8 @@ module ProtoProcessor
         report!(:status, FAILURE)
         report!(:error, {:name => e.class.name, :message => e.message})
         @error = e
-        ProtoProcessor.logger.debug "TASK ERROR: #{self.class.name}: #{e.class.name} => #{e.message}"
-        ProtoProcessor.logger.debug e.backtrace.join("\n")
+        ProtoProcessor.logger.error "TASK ERROR: #{self.class.name}: #{e.class.name} => #{e.message}"
+        ProtoProcessor.logger.error e.backtrace.join("\n")
       end
       [@input, @options, @report]
     end

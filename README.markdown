@@ -136,6 +136,10 @@ Default to STDOUT. Just add your own logger and logger level.
     ProtoProcessor.logger = Logger.new('my_processor.log')
     ProtoProcessor.logger.level = Logger::ERROR
 
+## TODO
+
+* Improve DSL in strategies
+* Better log formatting?
 
 ## Copyright
 
