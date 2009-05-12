@@ -1,15 +1,15 @@
-= proto_processor
+## proto_processor
 
 A couple of modules to ease the creation of background processors or any kind of delegated task or tasks for which you want flow control and error reporting.
 
-== Example
+## Examples
 
-=== Strategies
+### Strategies
 
 You start by defining a *strategy*. A strategy defines the sequence of tasks your program will carry out.
 
-require 'rubygems'
-require 'proto_processor'
+    require 'rubygems'
+    require 'proto_processor'
 
     class ImageStrategy
       include ProtoProcessor::Strategy
@@ -44,7 +44,7 @@ Strategy#run captures the output of tasks and gives you a Report object, with in
 
 Apart from the *process* method, Strategies are normal Ruby classes so you can go ahead and add whatever functionality you want to them, including, for example, an *initialize* method, or a factory.
 
-=== Tasks
+### Tasks
 
 Tasks do the real work. They also implement a *process* method where you can put you image resizing, file storing, email sending or whatever code you want.
 
@@ -65,7 +65,7 @@ That's pretty much it. Any exceptions raised within *process* will be captured, 
 
 Every task has an *options* hash available.
 
-=== Validating task options
+### Validating task options
 
 The previous example shows a simple way of checking that a task was passed required parameters as part of the options hash.
 
@@ -87,7 +87,7 @@ Lastly, you can define your own *validate* method which will be run before proce
       (1..500).include? options[:width]
     end
 
-=== Chaining tasks in strategies
+### Chaining tasks in strategies
 
     run_task [CropTask, ResizeTask, ZipTask, EmailTask], options
 
@@ -111,7 +111,7 @@ You can use task chains to process elements in a collection:
 
 If any task in the chain fails the error will be logged. The following tasks will not be processed.
 
-== Stand alone tasks
+### Stand alone tasks
 
 Tasks are quite simple objects. They expect an array with an input, an options hash and a report hash as an argument and return the same.
 
@@ -129,7 +129,7 @@ If a task expects a certain key in the report passed from a previous task in a c
 
 If :some_key doesn't exist in the passed report, the task will not process and halt any chain it is in.
 
-=== Logging
+### Logging
 
 Default to STDOUT. Just add your own logger and logger level.
 
@@ -137,6 +137,6 @@ ProtoProcessor.logger = Logger.new('my_processor.log')
 ProtoProcessor.logger.level = Logger::ERROR
 
 
-== Copyright
+## Copyright
 
 Copyright (c) 2009 Ismael Celis. See LICENSE for details.
