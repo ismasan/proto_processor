@@ -2,6 +2,10 @@
 
 A couple of modules to ease the creation of background processors or any kind of delegated task or tasks for which you want flow control and error reporting.
 
+## Install
+
+    sudo gem install ismasan-proto_processor
+
 ## Examples
 
 ### Strategies
