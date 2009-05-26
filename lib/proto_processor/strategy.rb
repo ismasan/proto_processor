@@ -10,9 +10,11 @@ module ProtoProcessor::Strategy
   
   def run
     begin
+      ProtoProcessor.logger.info "Running strategy #{self.class.name}"
       process
     rescue StandardError => e
       report.fail!(e)
+      ProtoProcessor.logger.error e.class.name
       ProtoProcessor.logger.debug e.message + "\n" + e.backtrace.join("\n")
     end
     yield report if block_given?

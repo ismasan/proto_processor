@@ -4,3 +4,4 @@ coverage
 rdoc
 pkg
 demo/test_images/test_*.jpg
+log/*

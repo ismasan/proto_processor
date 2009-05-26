@@ -12,6 +12,5 @@ module ProtoProcessor
     attr_accessor :logger
   end
 end
-
 ProtoProcessor.logger = Logger.new(STDOUT)
-ProtoProcessor.logger.level = Logger::DEBUG
+ProtoProcessor.logger.level = Logger::ERROR
