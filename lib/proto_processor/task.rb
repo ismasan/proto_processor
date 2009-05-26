@@ -41,15 +41,15 @@ module ProtoProcessor
       @error = nil
     end
     
-    class HaltedChainError < StandardError
-      def message
-        "Task not run because previous task failed"
-      end
-    end
+    # class HaltedChainError < StandardError
+    #       def message
+    #         "Task not run because previous task failed"
+    #       end
+    #     end
     
     def run
       begin
-        raise HaltedChainError if report[:status] == FAILURE
+        log_halt_task and return false if report[:status] == FAILURE
         run_validations!
         before_process
         process
@@ -63,8 +63,8 @@ module ProtoProcessor
         report!(:status, FAILURE)
         report!(:error, {:name => e.class.name, :message => e.message})
         @error = e
-        ProtoProcessor.logger.error "TASK ERROR: #{self.class.name}: #{e.class.name} => #{e.message}"
-        ProtoProcessor.logger.error e.backtrace.join("\n")
+        ProtoProcessor.logger.error "#{self.class.name}: #{e.class.name} => #{e.message}"
+        ProtoProcessor.logger.debug e.backtrace.join("\n")
       end
       [@input, @options, @report]
     end
@@ -107,6 +107,10 @@ module ProtoProcessor
     end
     
     protected
+    
+    def log_halt_task
+      ProtoProcessor.logger.info "#{self.class.name} not run because previous task failed"
+    end
     
     def validate
       # implement this in subclasses if needed
